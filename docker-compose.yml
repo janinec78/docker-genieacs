@@ -1,0 +1,43 @@
+version: '2'
+services:
+  mongodata:
+    image: mongo:3.2
+    volumes:
+      - /data/db:/data/db
+    command: --break-mongo
+
+  mongo:
+    image: mongo:3.2
+    volumes_from:
+      - mongodata
+    expose:
+      - 27017
+
+  redis:
+    image: redis:2.8
+    expose:
+      - 6379
+
+  genieacs-cwmp:
+    build: genieacs-cwmp
+    links:
+      - mongo
+      - redis
+    ports:
+      - "7547:7547"
+
+  genieacs-nbi:
+    build: genieacs-nbi
+    links:
+      - mongo
+      - redis
+    ports:
+      - "7557:7557"
+
+  genieacs-fs:
+    build: genieacs-fs
+    links:
+      - mongo
+      - redis
+    ports:
+      - "7567:7567"
